@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Text;
@@ -229,7 +229,7 @@ namespace Qiniu.Http
             {
                 headers["Content-Type"] = ContentType.WWW_FORM_URLENC;
             }
-            
+
             addAuthHeaders(ref headers, auth);
 
             string token = auth.CreateManageTokenV2("GET", url, headers);
@@ -274,12 +274,12 @@ namespace Qiniu.Http
         /// <param name="token">令牌(凭证)[可选 -> 设置为 null]</param>
         /// <param name="binaryMode">是否以二进制模式读取响应内容(默认:否，即表示以文本方式读取)</param>
         /// <returns>HTTP-POST 的响应结果</returns>
-        public HttpResult Post(string url, string token, bool binaryMode = false)
+        public HttpResult Post(string url, string token, bool binaryMode = false, Action<HttpRequestOptions> configureOptions = null)
         {
-            return Post(url, null, token, binaryMode);
+            return Post(url, null, token, binaryMode, configureOptions);
         }
 
-        public HttpResult Post(string url, StringDictionary headers, Auth auth, bool binaryMode = false)
+        public HttpResult Post(string url, StringDictionary headers, Auth auth, bool binaryMode = false, Action<HttpRequestOptions> configureOptions = null)
         {
             if (headers == null)
             {
@@ -296,7 +296,7 @@ namespace Qiniu.Http
             addAuthHeaders(ref headers, auth);
 
             string token = auth.CreateManageTokenV2("POST", url, headers);
-            return Post(url, headers, token, binaryMode);
+            return Post(url, headers, token, binaryMode, configureOptions);
         }
 
         /// <summary>
@@ -307,9 +307,10 @@ namespace Qiniu.Http
         /// <param name="headers">请求 Headers[可选 -> 设置为 null]</param>
         /// <param name="binaryMode">是否以二进制模式读取响应内容(默认:否，即表示以文本方式读取)</param>
         /// <returns>HTTP-POST 的响应结果</returns>
-        public HttpResult Post(string url, StringDictionary headers, string token, bool binaryMode = false)
+        public HttpResult Post(string url, StringDictionary headers, string token, bool binaryMode = false, Action<HttpRequestOptions> configureOptions = null)
         {
             HttpRequestOptions reqOpts = CreateHttpRequestOptions("POST", url, headers, token);
+            configureOptions?.Invoke(reqOpts);
             return SendRequest(reqOpts, binaryMode);
         }
 
@@ -441,7 +442,7 @@ namespace Qiniu.Http
             {
                 headers["Content-Type"] = ContentType.WWW_FORM_URLENC;
             }
-            
+
             addAuthHeaders(ref headers, auth);
 
             string token = auth.CreateManageTokenV2("POST", url, headers, data);
